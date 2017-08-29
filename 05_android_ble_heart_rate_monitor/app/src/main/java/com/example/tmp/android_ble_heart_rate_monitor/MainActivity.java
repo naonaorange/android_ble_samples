@@ -31,6 +31,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     Button scanButton;
+    TextView deviceNameTextView;
+    TextView addressTextView;
 
     BluetoothDevice selectedPeripheralDevice;
 
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         scanButton = (Button) findViewById(R.id.ScanButton);
         scanButton.setOnClickListener(new View.OnClickListener() {
@@ -48,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult( intent, requestCode );
             }
         });
+
+        deviceNameTextView = (TextView)findViewById(R.id.DeviceNameTextView);
+        addressTextView = (TextView)findViewById(R.id.AddressTextView);
     }
 
     public void onActivityResult( int requestCode, int resultCode, Intent intent )
@@ -55,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
         if( requestCode == 1001 ){
             if( resultCode == Activity.RESULT_OK ){
                 selectedPeripheralDevice = (BluetoothDevice)intent.getParcelableExtra("PeripheralDevice") ;
+
+                deviceNameTextView.setText(selectedPeripheralDevice.getName());
+                addressTextView.setText(selectedPeripheralDevice.getAddress());
             }
         }
     }
