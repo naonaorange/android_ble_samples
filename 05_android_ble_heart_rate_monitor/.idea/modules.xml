@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/05_android_ble_heart_rate_monitor.iml" filepath="$PROJECT_DIR$/05_android_ble_heart_rate_monitor.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android_ble_heart_rate_monitor.iml" filepath="$PROJECT_DIR$/android_ble_heart_rate_monitor.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
