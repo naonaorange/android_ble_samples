@@ -1,6 +1,7 @@
 package com.example.tmp.android_ble_heart_rate_monitor;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -29,144 +30,32 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    BluetoothManager btManager;
-    BluetoothAdapter btAdapter;
-    BluetoothLeScanner btScanner;
-    Button startScanningButton;
-    ListView peripheralListView;
+    Button scanButton;
 
-    private final static int REQUEST_ENABLE_BT = 1;
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    ArrayList<BluetoothDevice> peripheralDeviceList= new ArrayList<BluetoothDevice>();
-    BluetoothDevice selectedBtDevice;
-
-    private Handler mHandler = new Handler();
-    private static final long SCAN_PERIOD = 5000;
+    BluetoothDevice selectedPeripheralDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startScanningButton = (Button) findViewById(R.id.StartScanButton);
-        startScanningButton.setOnClickListener(new View.OnClickListener() {
+
+        scanButton = (Button) findViewById(R.id.ScanButton);
+        scanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startScanning();
-            }
-        });
-
-        btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        btAdapter = btManager.getAdapter();
-        btScanner = btAdapter.getBluetoothLeScanner();
-
-        peripheralListView = (ListView)findViewById(R.id.PeripheralListView);
-        peripheralListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                view.setSelected(true);
-                ListView listView = (ListView)parent;
-                selectedBtDevice = (BluetoothDevice)listView.getItemAtPosition(pos);
-            }
-        });
-
-        if (btAdapter != null && !btAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-        }
-
-        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-    }
-
-
-    private ScanCallback leScanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-
-            //デバイス名がないものは表示しない
-            if(result.getDevice().getName() == null) return;
-
-            //重複するものは表示しない
-            for(int i = 0; i < peripheralDeviceList.size(); i++) {
-                if (result.getDevice().getAddress().equals(peripheralDeviceList.get(i).getAddress())) return;
-            }
-
-            peripheralDeviceList.add(result.getDevice());
-
-            UserAdapter adapter = new UserAdapter(getApplicationContext(), 0, peripheralDeviceList);
-            peripheralListView.setAdapter(adapter);
-        }
-    };
-
-    public void startScanning() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                btScanner.startScan(leScanCallback);
-            }
-        });
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                stopScanning();
-            }
-        }, SCAN_PERIOD);
-    }
-
-    public void stopScanning() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                btScanner.stopScan(leScanCallback);
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                int requestCode = 1001;
+                startActivityForResult( intent, requestCode );
             }
         });
     }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_COARSE_LOCATION: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    System.out.println("coarse location permission granted");
-                } else {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                        }
-                    });
-                    builder.show();
-                }
-                return;
+    public void onActivityResult( int requestCode, int resultCode, Intent intent )
+    {
+        if( requestCode == 1001 ){
+            if( resultCode == Activity.RESULT_OK ){
+                selectedPeripheralDevice = (BluetoothDevice)intent.getParcelableExtra("PeripheralDevice") ;
             }
         }
-    }
-}
-
-
-class UserAdapter extends ArrayAdapter<BluetoothDevice> {
-    private LayoutInflater layoutInflater;
-    public UserAdapter(Context c, int id, ArrayList<BluetoothDevice> bds) {
-        super(c, id, bds);
-        this.layoutInflater = (LayoutInflater) c.getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE
-        );
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item, parent, false);
-        }
-
-        BluetoothDevice bd = (BluetoothDevice) getItem(position);
-        ((TextView) convertView.findViewById(R.id.name)).setText(bd.getName());
-        ((TextView) convertView.findViewById(R.id.comment)).setText(bd.getAddress());
-
-        return convertView;
     }
 }
