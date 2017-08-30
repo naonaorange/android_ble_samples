@@ -35,6 +35,8 @@ public class ScanActivity extends AppCompatActivity {
     Button startScanningButton;
     ListView peripheralListView;
 
+
+
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     ArrayList<BluetoothDevice> peripheralDeviceList= new ArrayList<BluetoothDevice>();
