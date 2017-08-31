@@ -93,10 +93,11 @@ public class MainActivity extends AppCompatActivity {
         heartRateList = new ArrayList<Entry>();
 
         heartRateList.add(new Entry(100, 0));
+        /*
         heartRateList.add(new Entry(120, 1));
         heartRateList.add(new Entry(150, 2));
         heartRateList.add(new Entry(250, 30));
-
+        */
         heartRateList.add(new Entry(0, 0));
         x++;
 
@@ -181,19 +182,22 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     heartRateValue.setText(String.valueOf(heartRate));
 
-                    heartRateList.add(new Entry(x, heartRate));
+
 
 
 
 
                 }
             });
-
+            heartRateList.add(new Entry(x, heartRate));
             LineDataSet valueDataSet = new LineDataSet(heartRateList, "Heart Rate Mesurement");
             valueDataSet.notifyDataSetChanged();
             chart.setData(new LineData(valueDataSet));
             chart.getData().notifyDataChanged();
             chart.notifyDataSetChanged();
+            chart.setVisibleXRange(0, 100);
+            chart.moveViewToX(valueDataSet.getEntryCount());
+            x++;
         }
     }
 
