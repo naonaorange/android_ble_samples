@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class ScanActivity extends AppCompatActivity {
     BluetoothAdapter btAdapter;
     BluetoothLeScanner btScanner;
     Button startScanningButton;
+    ProgressBar scanProgressBar;
     ListView peripheralListView;
 
 
@@ -56,6 +58,9 @@ public class ScanActivity extends AppCompatActivity {
                 startScan();
             }
         });
+
+        scanProgressBar = (ProgressBar)findViewById(R.id.ScanProgressBar);
+        scanProgressBar.setVisibility(View.INVISIBLE);
 
         btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
@@ -111,6 +116,12 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void run() {
                 btScanner.startScan(leScanCallback);
+                ScanActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        startScanningButton.setEnabled(false);
+                        scanProgressBar.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         });
 
@@ -118,6 +129,12 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void run() {
                 stopScan();
+                ScanActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        startScanningButton.setEnabled(true);
+                        scanProgressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
             }
         }, SCAN_PERIOD);
     }

@@ -42,4 +42,17 @@
         app:layout_constraintTop_toBottomOf="@+id/RescanButton"
         app:layout_constraintVertical_bias="0.0" />
 
+    <ProgressBar
+        android:id="@+id/ScanProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="35dp"
+        android:layout_height="39dp"
+        app:layout_constraintTop_toTopOf="@+id/RescanButton"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/RescanButton"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="@+id/RescanButton"
+        app:layout_constraintHorizontal_bias="0.493" />
+
 </android.support.constraint.ConstraintLayout>
