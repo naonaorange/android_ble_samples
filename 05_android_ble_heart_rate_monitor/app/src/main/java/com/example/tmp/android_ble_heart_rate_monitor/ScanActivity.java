@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -41,7 +42,8 @@ public class ScanActivity extends AppCompatActivity {
 
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    ArrayList<BluetoothDevice> peripheralDeviceList= new ArrayList<BluetoothDevice>();
+    //ArrayList<BluetoothDevice> peripheralDeviceList= new ArrayList<BluetoothDevice>();
+    ArrayList<DeviceInfo> peripheralDeviceList= new ArrayList<DeviceInfo>();
     BluetoothDevice selectedPeripheralDevice;
 
     private Handler mHandler = new Handler();
@@ -72,7 +74,7 @@ public class ScanActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                 view.setSelected(true);
                 ListView listView = (ListView)parent;
-                selectedPeripheralDevice = (BluetoothDevice)listView.getItemAtPosition(pos);
+                selectedPeripheralDevice = ((DeviceInfo)listView.getItemAtPosition(pos)).bluetoothDevice;
 
                 Intent intent = new Intent();
                 intent.putExtra( "PeripheralDevice", selectedPeripheralDevice );
@@ -101,10 +103,11 @@ public class ScanActivity extends AppCompatActivity {
 
             //重複するものは表示しない
             for(int i = 0; i < peripheralDeviceList.size(); i++) {
-                if (result.getDevice().getAddress().equals(peripheralDeviceList.get(i).getAddress())) return;
+                if (result.getDevice().getAddress().equals(peripheralDeviceList.get(i).bluetoothDevice.getAddress())) return;
             }
-
-            peripheralDeviceList.add(result.getDevice());
+            DeviceInfo info = new DeviceInfo(result.getDevice(), result.getRssi());
+            peripheralDeviceList.add(info);
+            //peripheralDeviceList.add(result.getDevice());
 
             UserAdapter adapter = new UserAdapter(getApplicationContext(), 0, peripheralDeviceList);
             peripheralListView.setAdapter(adapter);
@@ -173,7 +176,50 @@ public class ScanActivity extends AppCompatActivity {
     }
 }
 
+class DeviceInfo{
+    public BluetoothDevice bluetoothDevice;
+    public int rssi;
 
+    public DeviceInfo(BluetoothDevice device, int rssi){
+        this.bluetoothDevice = device;
+        this.rssi = rssi;
+    }
+
+    public BluetoothDevice getBluetoothDevice() {
+        return bluetoothDevice;
+    }
+
+    public int getRssi() {
+        return rssi;
+    }
+}
+
+
+class UserAdapter extends ArrayAdapter<DeviceInfo> {
+    private LayoutInflater layoutInflater;
+    public UserAdapter(Context c, int id, ArrayList<DeviceInfo> di) {
+        super(c, id, di);
+        this.layoutInflater = (LayoutInflater) c.getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE
+        );
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = layoutInflater.inflate(R.layout.list_item, parent, false);
+        }
+
+        DeviceInfo info = (DeviceInfo) getItem(position);
+        ((TextView) convertView.findViewById(R.id.name)).setText("Name : " + info.getBluetoothDevice().getName());
+        ((TextView) convertView.findViewById(R.id.comment)).setText("Addr   : " + info.getBluetoothDevice().getAddress());
+        ((TextView) convertView.findViewById(R.id.rssi)).setText("Rssi    : " + String.valueOf(info.getRssi()));
+
+        return convertView;
+    }
+}
+
+/*
 class UserAdapter extends ArrayAdapter<BluetoothDevice> {
     private LayoutInflater layoutInflater;
     public UserAdapter(Context c, int id, ArrayList<BluetoothDevice> bds) {
@@ -196,3 +242,5 @@ class UserAdapter extends ArrayAdapter<BluetoothDevice> {
         return convertView;
     }
 }
+*/
+
