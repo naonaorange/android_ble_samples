@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private static String UUID_DESCRIPTORS = "00002902-0000-1000-8000-00805f9b34fb";
 
     ArrayList<Entry> heartRateList;
-
     int x;
 
     @Override
@@ -92,12 +91,6 @@ public class MainActivity extends AppCompatActivity {
         chart = (LineChart) findViewById(R.id.Chart);
         heartRateList = new ArrayList<Entry>();
 
-        heartRateList.add(new Entry(100, 0));
-        /*
-        heartRateList.add(new Entry(120, 1));
-        heartRateList.add(new Entry(150, 2));
-        heartRateList.add(new Entry(250, 30));
-        */
         heartRateList.add(new Entry(0, 0));
         x++;
 
@@ -181,12 +174,6 @@ public class MainActivity extends AppCompatActivity {
             MainActivity.this.runOnUiThread(new Runnable() {
                 public void run() {
                     heartRateValue.setText(String.valueOf(heartRate));
-
-
-
-
-
-
                 }
             });
             heartRateList.add(new Entry(x, heartRate));

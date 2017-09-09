@@ -31,19 +31,18 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class ScanActivity extends AppCompatActivity {
+
     BluetoothManager btManager;
     BluetoothAdapter btAdapter;
     BluetoothLeScanner btScanner;
+
     Button startScanningButton;
     ProgressBar scanProgressBar;
-    ListView peripheralListView;
-
-
+    ListView deviceListView;
 
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    //ArrayList<BluetoothDevice> peripheralDeviceList= new ArrayList<BluetoothDevice>();
-    ArrayList<DeviceInfo> peripheralDeviceList= new ArrayList<DeviceInfo>();
+    ArrayList<DeviceInfo> deviceList= new ArrayList<DeviceInfo>();
     BluetoothDevice selectedPeripheralDevice;
 
     private Handler mHandler = new Handler();
@@ -68,8 +67,8 @@ public class ScanActivity extends AppCompatActivity {
         btAdapter = btManager.getAdapter();
         btScanner = btAdapter.getBluetoothLeScanner();
 
-        peripheralListView = (ListView)findViewById(R.id.PeripheralListView);
-        peripheralListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        deviceListView = (ListView)findViewById(R.id.PeripheralListView);
+        deviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                 view.setSelected(true);
@@ -102,15 +101,15 @@ public class ScanActivity extends AppCompatActivity {
             if(result.getDevice().getName() == null) return;
 
             //重複するものは表示しない
-            for(int i = 0; i < peripheralDeviceList.size(); i++) {
-                if (result.getDevice().getAddress().equals(peripheralDeviceList.get(i).bluetoothDevice.getAddress())) return;
+            for(int i = 0; i < deviceList.size(); i++) {
+                if (result.getDevice().getAddress().equals(deviceList.get(i).bluetoothDevice.getAddress())) return;
             }
             DeviceInfo info = new DeviceInfo(result.getDevice(), result.getRssi());
-            peripheralDeviceList.add(info);
+            deviceList.add(info);
             //peripheralDeviceList.add(result.getDevice());
 
-            UserAdapter adapter = new UserAdapter(getApplicationContext(), 0, peripheralDeviceList);
-            peripheralListView.setAdapter(adapter);
+            UserAdapter adapter = new UserAdapter(getApplicationContext(), 0, deviceList);
+            deviceListView.setAdapter(adapter);
         }
     };
 
@@ -176,71 +175,6 @@ public class ScanActivity extends AppCompatActivity {
     }
 }
 
-class DeviceInfo{
-    public BluetoothDevice bluetoothDevice;
-    public int rssi;
-
-    public DeviceInfo(BluetoothDevice device, int rssi){
-        this.bluetoothDevice = device;
-        this.rssi = rssi;
-    }
-
-    public BluetoothDevice getBluetoothDevice() {
-        return bluetoothDevice;
-    }
-
-    public int getRssi() {
-        return rssi;
-    }
-}
 
 
-class UserAdapter extends ArrayAdapter<DeviceInfo> {
-    private LayoutInflater layoutInflater;
-    public UserAdapter(Context c, int id, ArrayList<DeviceInfo> di) {
-        super(c, id, di);
-        this.layoutInflater = (LayoutInflater) c.getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE
-        );
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item, parent, false);
-        }
-
-        DeviceInfo info = (DeviceInfo) getItem(position);
-        ((TextView) convertView.findViewById(R.id.name)).setText("Name : " + info.getBluetoothDevice().getName());
-        ((TextView) convertView.findViewById(R.id.comment)).setText("Addr   : " + info.getBluetoothDevice().getAddress());
-        ((TextView) convertView.findViewById(R.id.rssi)).setText("Rssi    : " + String.valueOf(info.getRssi()));
-
-        return convertView;
-    }
-}
-
-/*
-class UserAdapter extends ArrayAdapter<BluetoothDevice> {
-    private LayoutInflater layoutInflater;
-    public UserAdapter(Context c, int id, ArrayList<BluetoothDevice> bds) {
-        super(c, id, bds);
-        this.layoutInflater = (LayoutInflater) c.getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE
-        );
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item, parent, false);
-        }
-
-        BluetoothDevice bd = (BluetoothDevice) getItem(position);
-        ((TextView) convertView.findViewById(R.id.name)).setText(bd.getName());
-        ((TextView) convertView.findViewById(R.id.comment)).setText(bd.getAddress());
-
-        return convertView;
-    }
-}
-*/
 
