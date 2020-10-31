@@ -1,0 +1,2 @@
+rootProject.name='ble_scan_monitor'
+include ':app'
