@@ -8,7 +8,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     Button startScanButton;
@@ -115,17 +118,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private List<ScanFilter> buildScanFilters() {
+        List<ScanFilter> scanFilters = new ArrayList<>();
+        ScanFilter.Builder builder = new ScanFilter.Builder();
+        //builder.setServiceUuid(null);
+        scanFilters.add(builder.build());
+        return scanFilters;
+    }
 
+    private ScanSettings buildScanSettings() {
+        ScanSettings.Builder builder = new ScanSettings.Builder();
+        builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+        builder.setLegacy(false);
+        builder.setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED);
+        return builder.build();
+    }
     public void startScan() {
         startScanButton.setEnabled(false);
         stopScanButton.setEnabled(true);
         deviceList= new ArrayList<>();
         UserAdapter adapter = new UserAdapter(getApplicationContext(), 0, deviceList);
         deviceListView.setAdapter(adapter);
+
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                btScanner.startScan(leScanCallback);
+                btScanner.startScan(buildScanFilters(), buildScanSettings(), leScanCallback);
             }
         });
     }
