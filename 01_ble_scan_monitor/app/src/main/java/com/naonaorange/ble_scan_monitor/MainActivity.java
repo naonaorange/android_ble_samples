@@ -26,7 +26,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     Button startScanButton;
     Button stopScanButton;
-    TextView scanResultTextView;
     ListView deviceListView;
 
     BluetoothManager btManager;
@@ -58,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
         });
         stopScanButton.setEnabled(false);
 
-        scanResultTextView = findViewById(R.id.scanResultTextView);
-        scanResultTextView.setMovementMethod(new ScrollingMovementMethod());
         deviceListView = findViewById(R.id.peripheralListView);
 
         btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
@@ -70,13 +67,15 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(btEnableIntent, REQUEST_ENABLE_BT);
         }
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+
+        startScan();
     }
 
     public ScanCallback leScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            if(result.getDevice().getName() == null) return;    //デバイス名がないものは表示しない
+            if(result.getDevice().getName() == null) return;//デバイス名がないものは表示しない
 
             boolean isNewDevice = true;
             for(int i = 0; i < deviceList.size(); i++) {
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                 DeviceInfo info = new DeviceInfo(result.getDevice(), result.getRssi());
                 deviceList.add(info);
             }
-
             UserAdapter adapter = new UserAdapter(getApplicationContext(), 0, deviceList);
             deviceListView.setAdapter(adapter);
         }
@@ -119,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startScan() {
-        scanResultTextView.setText("Start Scanning\n");
         startScanButton.setEnabled(false);
         stopScanButton.setEnabled(true);
         deviceList= new ArrayList<>();
@@ -134,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void stopScan(){
-        scanResultTextView.setText("Stop Scanning\n");
         startScanButton.setEnabled(true);
         stopScanButton.setEnabled(false);
         AsyncTask.execute(new Runnable() {
