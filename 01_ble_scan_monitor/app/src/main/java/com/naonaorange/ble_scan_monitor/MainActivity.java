@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         ScanSettings.Builder builder = new ScanSettings.Builder();
         builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
         builder.setLegacy(false);
-        builder.setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED);
+        //builder.setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED);
         return builder.build();
     }
     public void startScan() {
